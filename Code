@@ -1,0 +1,55 @@
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns 
+from sklearn.feature_extraction.text import CountVectorizer
+count=CountVectorizer()
+df=pd.read_csv(r"C:\Users\91909\OneDrive\Desktop\dissertation\reviews.csv")
+df.head()
+data = df[["Review", "Rating"]]
+data.head()
+import re
+def remove_url_mentions_hashtag(text):
+    text.loc[:, 'Review'] = text['Review'].str.lower() 
+    text.loc[:, 'Review'] = text['Review'].apply(lambda y: re.sub(r'https?://\S+|www\.\S+', '', y))
+    text.loc[:, 'Review'] = text['Review'].apply(lambda y: re.sub(r'@\S*', '', y))
+    text.loc[:, 'Review'] = text['Review'].apply(lambda y: re.sub(r'#\S*', '', y))
+    #Noise removal: Removing special characters (such as punctuations).
+    text.loc[:, 'Review'] = text.loc[:, 'Review'].apply(lambda y: re.sub(r'@user\w*\b', '', y))
+    text.loc[:, 'Review'] = text.loc[:, 'Review'].apply(lambda x: re.sub(r'[^\w\s#@€™]', '', x))
+    text.loc[:, 'Review'] = text.loc[:, 'Review'].apply(lambda x: re.sub(r'\buser\b', '', x))
+    print(text['Review'].head())
+remove_url_mentions_hashtag(data)   
+contractions_dict = {
+    "ain't": "am not",
+    "aren't": "are not",
+    "can't": "cannot",
+    # Add more contractions and their expanded forms as needed
+}
+
+def remove_contractions(text):
+    words = text.split()
+    expanded_words = [contractions_dict.get(word, word) for word in words]
+    expanded_text = ' '.join(expanded_words)
+    return expanded_text
+
+data['Review'] = data['Review'].apply(remove_contractions)
+# Join all words
+review_words = ' '.join(data_df.split())
+
+# Count the frequency of words
+counter = Counter(review_words.split())
+
+# Display the top 10 most frequent words
+top_10_words = counter.most_common(30)
+for word, count in top_10_words:
+    print(f"{word}: {count}")
+    # Display the first few rows of the DataFrame
+top_10_words = counter.most_common(30)
+ # Bar plot of frequent words
+fig = plt.figure(1, figsize=(20,10))
+_ = pd.DataFrame(top_10_words, columns=('words', 'count'))
+sns.barplot(x='words', y='count', data= _, palette='winter')
+plt.xticks(rotation=45)
+plt.title("30 most frequent words before removing stopwords");

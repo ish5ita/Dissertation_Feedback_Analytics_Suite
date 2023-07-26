@@ -53,3 +53,32 @@ _ = pd.DataFrame(top_10_words, columns=('words', 'count'))
 sns.barplot(x='words', y='count', data= _, palette='winter')
 plt.xticks(rotation=45)
 plt.title("30 most frequent words before removing stopwords");
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+import string
+
+# Download the stopwords and WordNetLemmatizer data (if not already downloaded)
+nltk.download('stopwords')
+nltk.download('wordnet')
+
+# Create a list of stopwords and extend it with additional words
+stopwords_list = set(stopwords.words('english'))
+stopwords_list.update(["spotify", "app", "song", "music", "songs"])
+
+def lemmatization(text):
+    return WordNetLemmatizer().lemmatize(text, pos='v')
+
+def preprocess(text):
+    result = []
+    for token in text.lower().split():
+        # Remove punctuation marks
+        token = token.strip(string.punctuation)
+        # Check if the token is not a stopword and not in stopwords_list
+        if token not in stopwords_list:
+            result.append(lemmatization(token))
+            
+    return result
+
+# Example usage (assuming 'data' is a DataFrame with a 'Review' column):
+data["Review_Clean_List"] = data["Review"].apply(preprocess)
